@@ -1,0 +1,91 @@
+/*-----------------------------------------------------------------------------------*/
+/*	1.	CSS Reset & Clearfix - http://meyerweb.com/eric/tools/css/reset/
+/*-----------------------------------------------------------------------------------*/
+.footer-info a {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+	color: #2980b9;
+	text-decoration:none;
+	-webkit-transition:all 0.2s linear;
+    -moz-transition:all 0.2s linear;
+    -o-transition:all 0.2s linear;
+    transition:all 0.2s linear;
+}
+
+ul.footer-info {
+	overflow: hidden;
+	/*margin-left: 65px;*/
+	position: relative;
+	float:right;
+	top: 13px;
+}
+
+ul.footer-info i {
+	color: #CFCFCF;/*#323232;*/
+	margin-right: 10px;
+}	
+
+ul.footer-info li {
+	display: inline;
+	float:left;
+	margin-right: 30px;
+	color: #CFCFCF;
+}
+
+ul.social {
+	/*
+	overflow: hidden;
+	display: block;
+	position: absolute;
+	top: -30px;
+	left: 65px;*/
+}
+
+ul.social li {
+	display:inline;
+	float:left;
+	font-size: 18px;
+	margin-right: 10px;
+}
+ul.social li a {
+	color: #fff;
+	padding: 11px 0;
+	display: block;
+	width: 38px;
+	text-align: center;
+}
+
+ul.social li a:hover {
+	color: #323232;
+	background: #fff;
+}
+
+ul.social i {
+	
+}
+
+.credits {
+	float: right;
+	margin-right: 10px;
+	color: #323232;
+}
+
+.separator {
+	clear: both;
+	display: block;
+	width: 140px;
+	height: 1px;
+	background: #fff;
+	opacity: 0.5;
+	margin: 15px 0 30px;
+}
+
+
+/* CUSTOM:ESTO CENTRA LAS IMAGENES DEL PORTAFOLIO*/
+.img-responsive { 
+    margin: auto;
+}

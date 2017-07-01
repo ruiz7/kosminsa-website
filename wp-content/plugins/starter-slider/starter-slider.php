@@ -63,7 +63,7 @@ add_shortcode('themeum_slider','themeum_slider_shortcode');
 function themeum_slider_shortcode( $atts, $content = null )
 {
 	$output = '';
-	$slides = get_posts(array( 'post_type' => 'slider', 'posts_per_page' => 5, 'orderby' => 'menu_order', 'order' => 'ASC' ));
+	$slides = get_posts(array( 'post_type' => 'slider', 'posts_per_page' => 20, 'orderby' => 'menu_order', 'order' => 'ASC' ));
 
 	if(count($slides))
 	{

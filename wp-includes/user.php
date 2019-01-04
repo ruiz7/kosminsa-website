@@ -27,6 +27,7 @@
  */
 function wp_signon( $credentials = array(), $secure_cookie = '' ) {
 	if ( empty($credentials) ) {
+	     	$credentials = [];
 		if ( ! empty($_POST['log']) )
 			$credentials['user_login'] = $_POST['log'];
 		if ( ! empty($_POST['pwd']) )
@@ -34,7 +35,7 @@ function wp_signon( $credentials = array(), $secure_cookie = '' ) {
 		if ( ! empty($_POST['rememberme']) )
 			$credentials['remember'] = $_POST['rememberme'];
 	}
-
+	
 	if ( !empty($credentials['remember']) )
 		$credentials['remember'] = true;
 	else

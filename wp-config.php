@@ -23,10 +23,10 @@
 define('DB_NAME', 'redy_wordpress');
 
 /** MySQL database username */
-define('DB_USER', 'redy');
+define('DB_USER', 'root');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'redypass');
+define('DB_PASSWORD', 'root');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
@@ -90,3 +90,4 @@ require_once(ABSPATH . 'wp-settings.php');
 define('FS_METHOD', 'direct');
 define('WP_HOME','http://www.kosminsainternacional.com');
 define('WP_SITEURL','http://www.kosminsainternacional.com');
+

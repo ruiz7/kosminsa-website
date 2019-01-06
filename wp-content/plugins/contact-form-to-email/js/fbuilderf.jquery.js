@@ -1,11 +1,11 @@
-jQuery.holdReady( true );
+/** jQuery.holdReady( true ); */
 jQuery(window).on('load', function(){
 (function($) {
 	$.fn.fbuilder = function(options){
 		var opt = $.extend({},
 				{
-	   				typeList:new Array({id:"ftext",name:"Single Line Text"},{id:"fnumber",name:"Number"},{id:"femail",name:"Email"},{id:"fdate",name:"Date"},{id:"ftextarea",name:"Text Area"},{id:"fcheck",name:"Checkboxes"},{id:"fradio",name:"Radio Buttons"},{id:"fdropdown",name:"Dropdown"},{id:"ffile",name:"Upload file"},{id:"fpassword",name:"Password"},{id:"fPhone",name:"Phone field"},{id:"fCommentArea",name:"Instruct. Text"},{id:"fSectionBreak",name:"Section break"},{id:"fPageBreak",name:"Page break"}),
-					pub:false,
+	   			typeList:new Array({id:"ftext",name:"Single Line"},{id:"fnumber",name:"Number"},{id:"femail",name:"Email"},{id:"fdate",name:"Date Time"},{id:"ftextarea",name:"Text Area"},{id:"fcurrency",name:"Currency"},{id:"fcheck",name:"Checkboxes"},{id:"fradio",name:"Radio Buttons"},{id:"fdropdown",name:"Dropdown"},{id:"ffile",name:"Upload File"},{id:"fpassword",name:"Password"},{id:"fPhone",name:"Phone field"},{id:"fCommentArea",name:"Instruct. Text"},{id:"fhidden",name:"Hidden"},{id:"fSectionBreak",name:"Section break"},{id:"fPageBreak",name:"Page break"},{id:"fsummary",name:"Summary"},{id:"fMedia",name:"Media"},{id:"fButton",name:"Button"},{id:"fhtml",name:"HTML content"},{id:"facceptance",name:"Accept / GDPR"},{id:"category",name:"Container Controls"},{id:"ffieldset",name:"Fieldset"},{id:"fdiv",name:"Div"},{id:"category",name:"Form Controls with Datasource Connection"},{id:"ftextds",name:"Line Text DS"},{id:"femailds",name:"Email DS"},{id:"ftextareads",name:"Text Area DS"},{id:"fcheckds",name:"Checkboxes DS"},{id:"fradiods",name:"Radio Btns DS"},{id:"fPhoneds",name:"Phone DS"},{id:"fdropdownds",name:"Dropdown DS"},{id:"fhiddends",name:"Hidden DS"},{id:"fnumberds",name:"Number DS"},{id:"fcurrencyds",name:"Currency DS"}),
+          pub:false,
 					identifier:"",
 					title:""
 				},options, true);
@@ -41,7 +41,12 @@ jQuery(window).on('load', function(){
 		if (!opt.pub)
 		{
 		  for (var i=0;i<opt.typeList.length;i++)			
-			  $("#tabs-1").append('<div class="button width40 '+(((i>5) || (i%2==1))?"n":"itemForm")+'" id="'+opt.typeList[i].id+'">'+opt.typeList[i].name+'</div>');
+		  {
+		    if (opt.typeList[i].id=="category")
+		        $("#tabs-1").append('<div style="clear:both;"></div><br /><div class="category-description">'+opt.typeList[i].name+'</div><hr />');
+		    else
+			      $("#tabs-1").append('<div class="button width40 '+(((i>5 && i!=20) || (i%2==1))?"n":"itemForm")+'" id="'+opt.typeList[i].id+'">'+opt.typeList[i].name+'</div>');
+			}  
 		  $("#tabs-1").append('<div class="clearer"></div>');
 		}  
 		if (!opt.pub) $( ".button").button();
@@ -54,6 +59,18 @@ jQuery(window).on('load', function(){
 			$(".helpfbuilder").click(function(){
                 alert($(this).attr("text"));
 			});
+            $("#sValue").bind("keyup",function(){
+                items[id].value = $(this).val();
+                reloadItems();
+            });
+            $("#sURL").bind("keyup",function(){
+                items[id].url = $(this).val();
+                reloadItems();
+            });
+            $("#sMessage").bind("keyup",function(){
+                items[id].message = $(this).val();
+                reloadItems();
+            });
             $("#sMinDate").change(function(){
                 items[id].minDate = $(this).val();
                 reloadItems();
@@ -378,6 +395,9 @@ jQuery(window).on('load', function(){
 			    $('#paypal_price_field').html(str);
 		    }
 		}
+		function htmlDecode(value){
+    	if(/&(?:#x[a-f0-9]+|#[0-9]+|[a-z0-9]+);?/ig.test(value))value=$('<div/>').html(value).text();return value;
+    };
 		function htmlEncode(value){
 		  value = $('<div/>').text(value).html()
           value = value.replace(/"/g, "&quot;");;
@@ -492,7 +512,7 @@ jQuery(window).on('load', function(){
 			        {
 			            if ($("#cpcaptchalayer"+opt.identifier).html())
 			            {
-			                code += '<div>'+$("#cpcaptchalayer"+opt.identifier).html()+'</div>';
+			                code += '<div class="fields cpfieldcaptcha" id="fieldcaptcha'+opt.identifier+'">'+$("#cpcaptchalayer"+opt.identifier).html()+'</div>';
 			                $("#cpcaptchalayer"+opt.identifier).html("");
 			            }
 			            if ($("#cp_subbtn"+opt.identifier).html())
@@ -519,7 +539,7 @@ jQuery(window).on('load', function(){
 			{
 			    if ($("#cpcaptchalayer"+opt.identifier).html())
 			    {
-			        $("#fieldlist"+opt.identifier+" .pb"+page).append('<div>'+$("#cpcaptchalayer"+opt.identifier).html()+'</div>');
+			        $("#fieldlist"+opt.identifier+" .pb"+page).append('<div class="fields cpfieldcaptcha" id="fieldcaptcha'+opt.identifier+'">'+$("#cpcaptchalayer"+opt.identifier).html()+'</div>');
 			        $("#cpcaptchalayer"+opt.identifier).html("");
 			    }
 			    if ($("#cp_subbtn"+opt.identifier).html())
@@ -569,6 +589,8 @@ jQuery(window).on('load', function(){
 			    } catch(e){}
 			    
 			}
+			for (var i=0;i<items.length;i++)
+			    items[i].after_show();
 		}
 		var showSettings= {
 			sizeList:new Array({id:"small",name:"Small"},{id:"medium",name:"Medium"},{id:"large",name:"Large"}),
@@ -609,7 +631,7 @@ jQuery(window).on('load', function(){
 				return '<div><label>Instructions for User</label><textarea class="large" name="sUserhelp" id="sUserhelp">'+v+'</textarea><br /><input type="checkbox" name="sUserhelpTooltip" id="sUserhelpTooltip" '+((c)?"checked":"")+' value="1" > Show as floating tooltip.</div>';
 			},
 			showCsslayout: function(v) {
-				return '<label>Add Css Layout Keywords</label><input class="large" name="sCsslayout" id="sCsslayout" value="'+v+'" />';
+				return '<label>Additional CSS Class</label><input class="large" name="sCsslayout" id="sCsslayout" value="'+v+'" />';
 			}
 		};
 		var fform=function(){};
@@ -618,10 +640,15 @@ jQuery(window).on('load', function(){
 				description:"This is my form. Please fill it out. It's awesome!",
 				formlayout:"top_aligned",
 				display:function(){
-					return '<div class="fform" id="field"><div class="arrow ui-icon ui-icon-play "></div><h1>'+this.title+'</h1><span>'+this.description+'</span></div>';
+					 return '<div class="fform" id="field">'+(this.title!=''?'<h1>'+this.title+'</h1>':'')+(this.description!=''?'<span>'+this.description+'</span>':'')+'</div>';
 				},
 				show:function(){
-					return '<div class="fform" id="field"><h1>'+this.title+'</h1><span>'+this.description+'</span></div>';
+                    var tmpstr = '';
+                    if (this.title != '')
+                        tmpstr += '<h1>'+this.title+'</h1>';
+                    if (this.description != '')
+                        tmpstr += '<span>'+this.description+'</span>';
+					return '<div class="fform" id="field">'+tmpstr+'</div>';
 				},
 				showAllSettings:function(){
 					var str = "";
@@ -643,6 +670,7 @@ jQuery(window).on('load', function(){
 				csslayout:"",
 				init:function(){
 				},
+				after_show:function(){},
 				showSpecialData:function(){
 					if(typeof this.showSpecialDataInstance != 'undefined')
 						return this.showSpecialDataInstance();
@@ -754,6 +782,60 @@ jQuery(window).on('load', function(){
                     return '<div class="column"><label>Min length/characters</label><br /><input name="sMinlength" id="sMinlength" value="'+this.minlength+'"></div><div class="column"><label>Max length/characters</label><br /><input name="sMaxlength" id="sMaxlength" value="'+this.maxlength+'"></div><div class="clearer"></div>';
                 }
 		});
+		var facceptance=function(){};
+		$.extend(facceptance.prototype,ffields.prototype,{
+				title:"Accept terms and conditions",
+			  ftype:"facceptance",
+			  value:"I accept",
+			  required:true,
+			  url:"",
+			  message:"",
+				display:function(){
+					return '<div class="fields" id="field'+opt.identifier+'-'+this.index+'"><div class="arrow ui-icon ui-icon-play "></div><div class="remove ui-icon ui-icon-trash "></div><div class="dfield"><input class="field" disabled="true" type="checkbox"/> '+this.title+((this.required)?"*":"")+'<span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
+				},
+				show:function(){
+					//return '<div class="fields '+this.csslayout+'" id="field'+opt.identifier+'-'+this.index+'"><label>'+this.title+''+((this.required)?"*":"")+'</label><div class="dfield"><input id="'+this.name+'" name="'+this.name+'" minlength="'+(this.minlength)+'" maxlength="'+htmlEncode(this.maxlength)+'" '+((this.equalTo!="")?"equalTo=\"#"+htmlEncode(this.equalTo+opt.identifier)+"\"":"" )+' class="field '+this.size+((this.required)?" required":"")+'" type="text" value="'+htmlEncode(this.predefined)+'"/><span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
+				var me = this,
+						dlg = '',
+						label = me.title;
+
+					if(!/^\s*$/.test(me.url))
+					{
+						label = '<a href="'+htmlEncode($.trim(me.url))+'" target="_blank">'+label+'</a>';
+					}
+					else if(!/^\s*$/.test(me.message))
+					{
+						label = '<a href="javascript:void(0);" class="cff-open-dlg">'+label+'</a>';
+						dlg += '<div class="cff-dialog hide"><span class="cff-close-dlg"></span><div class="cff-dialog-content">'+me.message+'</div></div>'
+					}
+					return '<div class="fields '+me.csslayout+' cff-checkbox-field" id="field'+me.identifier+'-'+me.index+'"><div class="dfield">'+
+					'<div class="one_column"><label><input name="'+me.name+'" id="'+me.name+'" class="field '+((this.required)?" required":"")+'" value="'+htmlEncode(me.value)+'" vt="'+htmlEncode((/^\s*$/.test(me.value)) ? me.title : me.value)+'" type="checkbox" /> <span>'+
+					htmlDecode( label )+''+((me.required)?'<span class="r">*</span>':'')+
+					'</span></label></div>'+
+					dlg+
+					'</div><div class="clearer"></div></div>';
+				
+				},
+				after_show:function()
+				{
+					$(document).on('click','.cff-open-dlg', function(){
+						var dlg = $(this).closest('.fields').find('.cff-dialog'), w = dlg.data('width'), h=dlg.data('height');
+						dlg.removeClass('hide');
+
+						if('undefined' == typeof w) w = Math.min($(this).closest('form').width(), $(window).width(), dlg.width());
+						if('undefined' == typeof h) h = Math.min($(this).closest('form').height(), $(window).height(), dlg.height());
+
+						dlg.data('width',w);
+						dlg.data('height',h);
+
+						dlg.css({'width': w+'px', 'height': h+'px', 'margin-top': (-1*h/2)+'px', 'margin-left': (-1*w/2)+'px'});
+					});
+					$(document).on('click','.cff-close-dlg', function(){$(this).closest('.cff-dialog').addClass('hide');});
+				},
+        showSpecialDataInstance: function() {
+          return '<div><label>Value</label><input class="large" type="text" name="sValue" id="sValue" value="'+htmlEncode(this.value)+'"></div><div><label>URL to the Consent and Acknowledgement page</label><input class="large" type="text" name="sURL" id="sURL" value="'+htmlEncode(this.url)+'"></div><div><label>- or - enter the Consent and Acknowledgement text</label><textarea class="large" name="sMessage" id="sMessage" style="height:150px;">'+this.message+'</textarea></div>';
+				}
+		});
 		var fpassword=function(){};
 		$.extend(fpassword.prototype,ffields.prototype,{
 				title:"Untitled",
@@ -785,10 +867,10 @@ jQuery(window).on('load', function(){
 				size:"medium",
 				equalTo:"",
 				display:function(){
-					return '<div class="fields" id="field'+opt.identifier+'-'+this.index+'"><div class="arrow ui-icon ui-icon-play "></div><div class="remove ui-icon ui-icon-trash "></div><label>'+this.title+''+((this.required)?"*":"")+'</label><div class="dfield"><input class="field disabled '+this.size+'" type="text" value="'+htmlEncode(this.predefined)+'"/><span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
+					return '<div class="fields" id="field'+opt.identifier+'-'+this.index+'"><div class="arrow ui-icon ui-icon-play "></div><div class="remove ui-icon ui-icon-trash "></div><label>'+this.title+''+((this.required)?"*":"")+'</label><div class="dfield"><input class="field disabled '+this.size+'" type="email" value="'+htmlEncode(this.predefined)+'"/><span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
 				},
 				show:function(){
-					return '<div class="fields '+this.csslayout+'" id="field'+opt.identifier+'-'+this.index+'"><label>'+this.title+''+((this.required)?"*":"")+'</label><div class="dfield"><input id="'+this.name+'" name="'+this.name+'" '+((this.equalTo!="")?"equalTo=\"#"+htmlEncode(this.equalTo+opt.identifier)+"\"":"" )+' class="field email '+this.size+((this.required)?" required":"")+'" type="text" value="'+htmlEncode(this.predefined)+'"/><span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
+					return '<div class="fields '+this.csslayout+'" id="field'+opt.identifier+'-'+this.index+'"><label>'+this.title+''+((this.required)?"*":"")+'</label><div class="dfield"><input id="'+this.name+'" name="'+this.name+'" '+((this.equalTo!="")?"equalTo=\"#"+htmlEncode(this.equalTo+opt.identifier)+"\"":"" )+' class="field email '+this.size+((this.required)?" required":"")+'" type="email" value="'+htmlEncode(this.predefined)+'"/><span class="uh">'+this.userhelp+'</span></div><div class="clearer"></div></div>';
 				},
                 showSpecialDataInstance: function() {
                     var str = "";
@@ -1325,5 +1407,5 @@ jQuery(window).on('load', function(){
 	    	fnum = "_"+fcount;
 	    }
 })(jQuery);
-jQuery.holdReady(false);
+/** jQuery.holdReady(false); */
 });

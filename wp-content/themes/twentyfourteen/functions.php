@@ -60,15 +60,58 @@ function twentyfourteen_setup() {
 	/*
 	 * Make Twenty Fourteen available for translation.
 	 *
-	 * Translations can be added to the /languages/ directory.
+	 * Translations can be filed at WordPress.org. See: https://translate.wordpress.org/projects/wp-themes/twentyfourteen
 	 * If you're building a theme based on Twenty Fourteen, use a find and
 	 * replace to change 'twentyfourteen' to the name of your theme in all
 	 * template files.
 	 */
-	load_theme_textdomain( 'twentyfourteen', get_template_directory() . '/languages' );
+	load_theme_textdomain( 'twentyfourteen' );
 
 	// This theme styles the visual editor to resemble the theme style.
 	add_editor_style( array( 'css/editor-style.css', twentyfourteen_font_url(), 'genericons/genericons.css' ) );
+
+	// Load regular editor styles into the new block-based editor.
+	add_theme_support( 'editor-styles' );
+
+	// Load default block styles.
+	add_theme_support( 'wp-block-styles' );
+
+	// Add support for responsive embeds.
+	add_theme_support( 'responsive-embeds' );
+
+	// Add support for custom color scheme.
+	add_theme_support( 'editor-color-palette', array(
+		array(
+			'name'  => __( 'Green', 'twentyfourteen' ),
+			'slug'  => 'green',
+			'color' => '#24890d',
+		),
+		array(
+			'name'  => __( 'Black', 'twentyfourteen' ),
+			'slug'  => 'black',
+			'color' => '#000',
+		),
+		array(
+			'name'  => __( 'Dark Gray', 'twentyfourteen' ),
+			'slug'  => 'dark-gray',
+			'color' => '#2b2b2b',
+		),
+		array(
+			'name'  => __( 'Medium Gray', 'twentyfourteen' ),
+			'slug'  => 'medium-gray',
+			'color' => '#767676',
+		),
+		array(
+			'name'  => __( 'Light Gray', 'twentyfourteen' ),
+			'slug'  => 'light-gray',
+			'color' => '#f5f5f5',
+		),
+		array(
+			'name'  => __( 'White', 'twentyfourteen' ),
+			'slug'  => 'white',
+			'color' => '#fff',
+		),
+	) );
 
 	// Add RSS feed links to <head> for posts and comments.
 	add_theme_support( 'automatic-feed-links' );
@@ -239,6 +282,9 @@ function twentyfourteen_scripts() {
 	// Load our main stylesheet.
 	wp_enqueue_style( 'twentyfourteen-style', get_stylesheet_uri() );
 
+	// Theme block stylesheet.
+	wp_enqueue_style( 'twentyfourteen-block-style', get_template_directory_uri() . '/css/blocks.css', array( 'twentyfourteen-style' ), '20181018' );
+
 	// Load the Internet Explorer specific stylesheet.
 	wp_enqueue_style( 'twentyfourteen-ie', get_template_directory_uri() . '/css/ie.css', array( 'twentyfourteen-style' ), '20131205' );
 	wp_style_add_data( 'twentyfourteen-ie', 'conditional', 'lt IE 9' );
@@ -276,6 +322,44 @@ function twentyfourteen_admin_fonts() {
 	wp_enqueue_style( 'twentyfourteen-lato', twentyfourteen_font_url(), array(), null );
 }
 add_action( 'admin_print_scripts-appearance_page_custom-header', 'twentyfourteen_admin_fonts' );
+
+/**
+ * Add preconnect for Google Fonts.
+ *
+ * @since Twenty Fourteen 1.9
+ *
+ * @param array   $urls          URLs to print for resource hints.
+ * @param string  $relation_type The relation type the URLs are printed.
+ * @return array URLs to print for resource hints.
+ */
+function twentyfourteen_resource_hints( $urls, $relation_type ) {
+	if ( wp_style_is( 'twentyfourteen-lato', 'queue' ) && 'preconnect' === $relation_type ) {
+		if ( version_compare( $GLOBALS['wp_version'], '4.7-alpha', '>=' ) ) {
+			$urls[] = array(
+				'href' => 'https://fonts.gstatic.com',
+				'crossorigin',
+			);
+		} else {
+			$urls[] = 'https://fonts.gstatic.com';
+		}
+	}
+
+	return $urls;
+}
+add_filter( 'wp_resource_hints', 'twentyfourteen_resource_hints', 10, 2 );
+
+/**
+ * Enqueue styles for the block-based editor.
+ *
+ * @since Twenty Fourteen 2.3
+ */
+function twentyfourteen_block_editor_styles() {
+	// Block styles.
+	wp_enqueue_style( 'twentyfourteen-block-editor-style', get_template_directory_uri() . '/css/editor-blocks.css' );
+	// Add custom fonts.
+	wp_enqueue_style( 'twentyfourteen-fonts', twentyfourteen_font_url(), array(), null );
+}
+add_action( 'enqueue_block_editor_assets', 'twentyfourteen_block_editor_styles' );
 
 if ( ! function_exists( 'twentyfourteen_the_attached_image' ) ) :
 /**
@@ -319,9 +403,9 @@ function twentyfourteen_the_attached_image() {
 
 	// If there is more than 1 attachment in a gallery...
 	if ( count( $attachment_ids ) > 1 ) {
-		foreach ( $attachment_ids as $attachment_id ) {
+		foreach ( $attachment_ids as $idx => $attachment_id ) {
 			if ( $attachment_id == $post->ID ) {
-				$next_id = current( $attachment_ids );
+				$next_id = $attachment_ids[ ( $idx + 1 ) % count( $attachment_ids ) ];
 				break;
 			}
 		}
@@ -502,6 +586,27 @@ function twentyfourteen_wp_title( $title, $sep ) {
 }
 add_filter( 'wp_title', 'twentyfourteen_wp_title', 10, 2 );
 
+
+/**
+ * Modifies tag cloud widget arguments to display all tags in the same font size
+ * and use list format for better accessibility.
+ *
+ * @since Twenty Fourteen 2.1
+ *
+ * @param array $args Arguments for tag cloud widget.
+ * @return array The filtered arguments for tag cloud widget.
+ */
+function twentyfourteen_widget_tag_cloud_args( $args ) {
+	$args['largest']  = 22;
+	$args['smallest'] = 8;
+	$args['unit']     = 'pt';
+	$args['format']   = 'list';
+
+	return $args;
+}
+add_filter( 'widget_tag_cloud_args', 'twentyfourteen_widget_tag_cloud_args' );
+
+
 // Implement Custom Header features.
 require get_template_directory() . '/inc/custom-header.php';
 
@@ -520,3 +625,17 @@ require get_template_directory() . '/inc/customizer.php';
 if ( ! class_exists( 'Featured_Content' ) && 'plugins.php' !== $GLOBALS['pagenow'] ) {
 	require get_template_directory() . '/inc/featured-content.php';
 }
+
+/**
+ * Add an `is_customize_preview` function if it is missing.
+ *
+ * Enables installing Twenty Fourteen in WordPress versions before 4.0.0 when the
+ * `is_customize_preview` function was introduced.
+ */
+if ( ! function_exists( 'is_customize_preview' ) ) :
+function is_customize_preview() {
+	global $wp_customize;
+
+	return ( $wp_customize instanceof WP_Customize_Manager ) && $wp_customize->is_preview();
+}
+endif;

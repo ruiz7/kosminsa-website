@@ -11,12 +11,7 @@ $this->item = intval($_GET["cal"]);
 global $wpdb;
 
 if ($this->item != 0)
-    $myform = $wpdb->get_results( 'SELECT * FROM '.$wpdb->prefix.$this->table_items .' WHERE id='.$this->item);
-
-
-$current_page = intval($_GET["p"]);
-if (!$current_page) $current_page = 1;
-$records_per_page = 50;                                                                                  
+    $myform = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM '.$wpdb->prefix.$this->table_items .' WHERE id=%d', $this->item ) );
 
 $date_start = '';
 $date_end = '';
@@ -26,14 +21,15 @@ if ($_GET["search"] != '') $cond .= " AND (data like '%".esc_sql($_GET["search"]
 if ($_GET["dfrom"] != '') 
 { 
     $cond .= " AND (`time` >= '".esc_sql($_GET["dfrom"])."')";
-    $date_start = $_GET["dfrom"];
+    $date_start = strip_tags($_GET["dfrom"]);
 }    
 if ($_GET["dto"] != '') 
 {
     $cond .= " AND (`time` <= '".esc_sql($_GET["dto"])." 23:59:59')";
-    $date_end = $_GET["dto"];
+    $date_end = strip_tags($_GET["dto"]);
 }    
-if ($this->item != 0) $cond .= " AND formid=".$this->item;
+if (isset($_GET["field"])) $_GET["field"] = strip_tags($_GET["field"]);
+if ($this->item != 0) $cond .= " AND formid=".intval($this->item);
 
 $events = $wpdb->get_results( "SELECT ipaddr,time,notifyto,posted_data FROM ".$wpdb->prefix.$this->table_messages." WHERE 1=1 ".$cond." ORDER BY `time` DESC" );
 
@@ -82,7 +78,7 @@ $daily_messages = substr($daily_messages,1);
 
 if (!isset($_GET["field"])) $_GET["field"] = 'time';
 
-$color_array = array(/**'ff0000',*/'ff4500','ff6347','f08080', 'ff7f50', 'ff8c00', 'ffa500', 'ffa07a', 'fa8072', 'e9967a', 'f5deb3', 'ffe4c4', 'ffebcd', 'ffefd5');
+$color_array = array('ffb3ba','ffdfba','ffffba', 'baffc9', 'bae1ff', 'a8e6cf', 'dcedc1', 'ffd3b6', 'ffaaa5', 'ff8b94', 'eea990', 'adcbe3', 'e2f4c7');
 
 
 if ($this->item)
@@ -94,126 +90,134 @@ else
     $form = array();
             
 ?>
-<link href="<?php echo plugins_url('css/style.css', __FILE__); ?>" type="text/css" rel="stylesheet" />   
 
-<div class="wrap">
-<h1><?php echo $this->plugin_name; ?> - Report</h1>
+<h1><?php echo $this->plugin_name; ?> Stats - <?php echo $this->get_option("form_name",""); ?></h1>
 
-<input type="button" name="backbtn" value="Back to items list..." onclick="document.location='admin.php?page=<?php echo $this->menu_parameter; ?>';">
 
-<div id="normal-sortables" class="meta-box-sortables">
- <hr />
- <h3>This report is for: <?php if ($this->item != 0) echo $myform[0]->form_name; else echo 'All forms'; ?></h3>
+
+<div class="ahb-buttons-container">
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;Return to the items list</a>
+	<div class="clear"></div>
 </div>
 
-
-<form action="admin.php" method="get">
- <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>" />
- <input type="hidden" name="cal" value="<?php echo $this->item; ?>" />
- <input type="hidden" name="report" value="1" />
- <input type="hidden" name="field" value="<?php echo esc_attr($_GET["field"]); ?>" />
- <nobr>Search for: <input type="text" name="search" value="<?php echo esc_attr($_GET["search"]); ?>" /> &nbsp; &nbsp; &nbsp;</nobr> 
- <nobr>From: <input type="text" id="dfrom" name="dfrom" value="<?php echo esc_attr($_GET["dfrom"]); ?>" /> &nbsp; &nbsp; &nbsp; </nobr>
- <nobr>To: <input type="text" id="dto" name="dto" value="<?php echo esc_attr($_GET["dto"]); ?>" /> &nbsp; &nbsp; &nbsp; </nobr>
- <nobr>Item: <select id="cal" name="cal">
-          <option value="0">[All Items]</option>
+<div class="ahb-section-container">
+	<div class="ahb-section">
+       <form action="admin.php" method="get">
+        <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>" />
+        <input type="hidden" name="cal" value="<?php echo $this->item; ?>" />
+        <input type="hidden" name="report" value="1" />
+        <input type="hidden" name="field" value="<?php echo esc_attr($_GET["field"]); ?>" />
+		<nobr><label>Search for:</label> <input type="text" name="search" value="<?php echo esc_attr($_GET["search"]); ?>">&nbsp;&nbsp;</nobr>
+		<nobr><label>From:</label> <input type="text" id="dfrom" name="dfrom" value="<?php echo esc_attr($_GET["dfrom"]); ?>" >&nbsp;&nbsp;</nobr>
+		<nobr><label>To:</label> <input type="text" id="dto" name="dto" value="<?php echo esc_attr($_GET["dto"]); ?>" >&nbsp;&nbsp;</nobr>
+		<nobr><label>Item:</label> <select id="cal" name="cal">
+          <option value="0">[<?php _e('All Items','cpappb'); ?>]</option>
    <?php
-    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );                                                                     
-    foreach ($myrows as $item)  
-         echo '<option value="'.$item->id.'"'.(intval($item->id)==intval($this->item)?" selected":"").'>'.$item->form_name.'</option>'; 
+    $myrows = $wpdb->get_results( "SELECT * FROM ".$wpdb->prefix.$this->table_items );
+    foreach ($myrows as $item)
+         echo '<option value="'.$item->id.'"'.(intval($item->id)==intval($this->item)?" selected":"").'>'.$item->form_name.'</option>';
    ?>
     </select></nobr>
- <nobr><span class="submit"><input type="submit" name="ds" value="Filter" /></span> &nbsp; &nbsp; &nbsp; 
- <span class="submit"><input type="submit" name="<?php echo $this->prefix; ?>_csv" value="Export to CSV" /></span></nobr>
-</form>
+		<nobr>
+			<input type="submit" name="<?php echo $this->prefix; ?>_csv" value="<?php _e('Export to CSV','cpappb'); ?>" class="button" style="float:right;margin-left:10px;">
+			<input type="submit" name="ds" value="<?php _e('Filter','cpappb'); ?>" class="button-primary button" style="float:right;">
+		</nobr>
+       </form>
+	</div>
+</div>
+
+
+<div class="ahb-statssection-container" style="background:#f6f6f6;float:left;width:48%;">
+	<div class="ahb-statssection-header">
+		<h3>Submissions per day</h3>
+	</div>
+	<div class="ahb-statssection">
+        <div class="canvas" id="cardiocontainer1" style="margin-left:10px;position:relative;">
+         <canvas id="cardio1"  width="300" height="200" questions='[{"color":"#008ec2","values":[<?php echo $daily_messages; ?>]}]'></canvas>
+        </div>
+        <div style="padding-right:5px;padding-left:5px;color:#888888;">* <?php _e('Submissions per day in the selected date range.','cpappb'); ?><br />&nbsp;&nbsp; <?php _e('Days from','cpappb'); ?> <?php echo $date_start; ?> to <?php echo $date_end; ?>.</div>
+        <div class="clear"></div>
+	</div>
+</div>
+
+<div class="ahb-statssection-container" style="background:#f6f6f6;float:right;width:48%;">
+	<div class="ahb-statssection-header">
+		<h3>Submissions per hour</h3>
+	</div>
+	<div class="ahb-statssection" >
+		<div class="canvas" id="cardiocontainer2" style="margin-left:10px;position:relative;">
+         <canvas id="cardio2"  width="312" height="200" questions='[{"color":"#008ec2","values":[<?php echo $hourly_messages; ?>]}]'></canvas>
+        </div>
+        <div style="padding-right:5px;padding-left:5px;color:#888888;">* <?php _e('Total submissions per hour in the selected date range.','cpappb'); ?><br />&nbsp;&nbsp; <?php _e('Hours from 0 to 23','cpappb'); ?>.</div>
+        <div class="clear"></div>
+	</div>
+</div>
+<div class="clear"></div>
 
 <br />
 
-<div style="border:1px solid black;width:320px;margin-right:10px;padding:0px;float:left;"> 
- <div style="border-bottom:1px solid black;padding:5px;background:#ECECEC;color:#21759B;font-weight: bold;">
-   Submissions per day
- </div>
- <div class="canvas" id="cardiocontainer1" style="margin-left:10px;">
-  <canvas id="cardio1"  width="300" height="200" questions='[{"color":"#00f","values":[<?php echo $daily_messages; ?>]}]'></canvas>
- </div>
- <div style="padding-right:5px;padding-left:5px;color:#888888;">* Submissions per day in the selected date range.<br />&nbsp;&nbsp; Days from <?php echo $date_start; ?> to <?php echo $date_end; ?>.</div>
-</div> 
 
-<div style="border:1px solid black;width:330px;margin:0px;padding:0px;float:left;"> 
- <div style="border-bottom:1px solid black;padding:5px;background:#ECECEC;color:#21759B;font-weight: bold;">
-   Submissions per hour
- </div>
- <div class="canvas" id="cardiocontainer2" style="margin-left:10px;">
-  <canvas id="cardio2"  width="312" height="200" questions='[{"color":"#00f","values":[<?php echo $hourly_messages; ?>]}]'></canvas>
- </div>
- <div style="padding-right:5px;padding-left:5px;color:#888888;">* Total submissions per hour in the selected date range.<br />&nbsp;&nbsp; Hours from 0 to 23.</div>
-</div> 
+<div class="ahb-statssection-container" style="background:#f6f6f6;">
+	<div class="ahb-statssection-header">
+        <form action="admin.php" name="cfm_formrep" method="get">
+         <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>" />
+         <input type="hidden" name="cal" value="<?php echo $this->item; ?>" />
+         <input type="hidden" name="report" value="1" />
+         <input type="hidden" name="search" value="<?php echo esc_attr($_GET["search"]); ?>" />
+         <input type="hidden" name="dfrom" value="<?php echo esc_attr($_GET["dfrom"]); ?>" />
+         <input type="hidden" name="dto" value="<?php echo esc_attr($_GET["dto"]); ?>" />
+		 <h3><?php _e('Select field for the report','cpappb'); ?>: <select name="field" onchange="document.cfm_formrep.submit();">
+              <?php
+                   foreach ($fields as $item => $value)
+                       echo '<option value="'.esc_attr($item).'"'.($_GET["field"]==$item?' selected':'').'>'.$this->get_form_field_label($item,$form).'</option>';
+              ?>
+         </select></h3>
+        </form>
+	</div>
+	<div class="ahb-statssection">
+        <div id="dex_printable_contents">
 
- 
-<div style="clear:both"></div>
- 
-<hr /> 
-<br />
-<form action="admin.php" name="cfm_formrep" method="get">
- <input type="hidden" name="page" value="<?php echo $this->menu_parameter; ?>" />
- <input type="hidden" name="cal" value="<?php echo $this->item; ?>" />
- <input type="hidden" name="report" value="1" />
- <input type="hidden" name="search" value="<?php echo esc_attr($_GET["search"]); ?>" />
- <input type="hidden" id="dfrom" name="dfrom" value="<?php echo esc_attr($_GET["dfrom"]); ?>" />
- <input type="hidden" id="dto" name="dto" value="<?php echo esc_attr($_GET["dto"]); ?>" />    
- <strong>Select field for the report:</strong><br />
- <select name="field" onchange="document.cfm_formrep.submit();">
- <?php
-  foreach ($fields as $item => $value)    
-      echo '<option value="'.esc_attr($item).'"'.($_GET["field"]==$item?' selected':'').'>'.$this->get_form_field_label($item,$form).'</option>';
- ?>
- </select>
- <br /><br />
-</form>
+        <div style="width:100%;padding:0;background:white;border:1px solid #e6e6e6;">
+         <div style="padding:10px;background:#ECECEC;color:#21759B;font-weight: bold;">
+           <?php _e('Report of values for','cpappb'); ?>: <em><?php echo $this->get_form_field_label($_GET["field"],$form); ?></em>
+         </div>
 
+        <div style="padding:10px;">
+        <?php
+          $arr = $fields[$_GET["field"]];
+          arsort($arr, SORT_NUMERIC);
+          $total = 0;
+          /* $totalsize = 600; */
+          foreach ($arr as $item => $value)
+              $total += $value;
+          /* $max = max($arr);
+          $totalsize = round(600 / ($max/$total) ); */
+          $count = 0;
+          foreach ($arr as $item => $value)
+          {
+              echo $value.' times: '.(strlen($item)>50?substr($item,1,50).'...':substr($item,1));
+              echo '<div style="width:'.round($value/$total*100).'%;border:1px solid white;margin-bottom:3px;font-size:9px;text-align:center;font-weight:bold;background-color:#'.$color_array[$count].'">'.round($value/$total*100,2).'%</div>';
+              $count++;
+              if ($count >= count($color_array)) $count = count($color_array)-1;
+          }
+        ?>
+        </div>
 
-<div id="dex_printable_contents">
+         <div style="padding-right:5px;padding-left:5px;margin-bottom:20px;color:#888888;">&nbsp;&nbsp;* <?php _e('Number of times that appears each value. Percent in relation to the total of submissions.','cpappb'); ?><br />&nbsp;&nbsp;&nbsp;&nbsp; <?php _e('Date range from','cpappb'); ?> <?php echo $date_start; ?> <?php _e('to','cpappb'); ?> <?php echo $date_end; ?>.</div>
+        </div>
 
-
-<div style="border:1px solid black;width:650px;margin-right:10px;padding:0px;float:left;"> 
- <div style="border-bottom:1px solid black;padding:5px;background:#ECECEC;color:#21759B;font-weight: bold;">
-   Report of values for: <em><?php echo $this->get_form_field_label($_GET["field"],$form); ?></em>
- </div>
- 
-<div style="padding:10px;">
-<?php
-  $arr = $fields[$_GET["field"]];
-  arsort($arr, SORT_NUMERIC);
-  $total = 0;
-  $totalsize = 600;
-  foreach ($arr as $item => $value)  
-      $total += $value;
-  $max = max($arr);
-  $totalsize = round(600 / ($max/$total) );
-  $count = 0;    
-  foreach ($arr as $item => $value)
-  {
-      echo $value.' times: '.(strlen($item)>50?substr($item,1,50).'...':substr($item,1));
-      echo '<div style="width:'.round($value/$total*$totalsize).'px;border:1px solid black;margin-bottom:3px;font-size:9px;background-color:#'.$color_array[$count].'">'.round($value/$total*100,2).'%</div>';       
-      $count++;
-      if ($count >= count($color_array)) $count = count($color_array)-1;
-  }    
-?>
-</div>
-
- <div style="padding-right:5px;padding-left:5px;color:#888888;">&nbsp;&nbsp;* Number of times that appears each value. Percent in relation to the total of submissions.<br />&nbsp;&nbsp;&nbsp;&nbsp; Date range from <?php echo $date_start; ?> to <?php echo $date_end; ?>.</div>
+        <div style="clear:both"></div>
+        </div>
+	</div>
 </div>
 
 
-<div style="clear:both"></div>
 
-
+<div class="ahb-buttons-container">
+	<input type="button" value="<?php _e('Print Stats','cpappb'); ?>" onclick="do_dexapp_print();" class="button button-primary" />
+	<a href="<?php print esc_attr(admin_url('admin.php?page='.$this->menu_parameter));?>" class="ahb-return-link">&larr;Return to the calendars list</a>
+	<div class="clear"></div>
 </div>
-
-<p class="submit"><input type="button" name="pbutton" value="Print" onclick="do_dexapp_print();" /></p>
-
-</div>
-
 
 <script type="text/javascript">
 
@@ -222,103 +226,105 @@ else
       w=window.open();
       w.document.write("<style>.cpnopr{display:none;};table{border:2px solid black;width:100%;}th{border-bottom:2px solid black;text-align:left}td{padding-left:10px;border-bottom:1px solid black;}</style>"+document.getElementById('dex_printable_contents').innerHTML);
       w.print();
-      w.close();    
+      w.close();
  }
- 
+
  var $j = jQuery.noConflict();
  $j(function() {
- 	$j("#dfrom").datepicker({     	                
+ 	$j("#dfrom").datepicker({
                     dateFormat: 'yy-mm-dd'
                  });
- 	$j("#dto").datepicker({     	                
+ 	$j("#dto").datepicker({
                     dateFormat: 'yy-mm-dd'
                  });
  });
- 
+
 </script>
 
 
 <script type='text/javascript' src='<?php echo plugins_url('js/excanvas.min.js', __FILE__); ?>'></script>
 <script type="text/javascript">
 var $ = jQuery.noConflict();
-$j(document).ready(function(){
-		    /////////////////////////canvas//////////////////////////
-		    $(window).on('load',function(){
-                drawGraph($("#cardio1"), $("#cardiocontainer1"));
+$(document).ready(function(){   }); 
+		    /////////////////////////canvas//////////////////////////            
+		    $(window).on('load',function(){            
+            drawGraph($("#cardio1"), $("#cardiocontainer1"));
                 drawGraph($("#cardio2"), $("#cardiocontainer2"));
                 function drawGraph(canvas, canvasContainer)
                 {
 		            if( typeof(G_vmlCanvasManager) != 'undefined' ){ G_vmlCanvasManager.init(); G_vmlCanvasManager.initElement(canvas[0]); }
-		            ctx = canvas[0].getContext("2d"); 
+		            ctx = canvas[0].getContext("2d");
 		            var data = jQuery.parseJSON(canvas.attr("questions"));
 		            var height = canvas.attr("height");
 		            var width = canvas.attr("width");
 		            var maxquestions = 0,maxpos = 0,minpos = 0,interval = 5;
-		            
+
 		            jQuery.each(data,function(index,v){
-		                maxquestions = (maxquestions<v.values.length)?v.values.length:maxquestions;    
+		                maxquestions = (maxquestions<v.values.length)?v.values.length:maxquestions;
 		                postmp = 0;
 		                jQuery.each(v.values,function(index1,v1){
-		                    maxpos = (maxpos<v1)?v1:maxpos;    
-		                    minpos = (minpos>v1)?v1:minpos;                
-		                }); 
-		                    
-		            });		        
+		                    maxpos = (maxpos<v1)?v1:maxpos;
+		                    minpos = (minpos>v1)?v1:minpos;
+		                });
+
+		            });
 		            maxpos = maxpos;//Math.ceil(maxpos/interval)*interval;
-		            minpos = 0; //Math.floor(minpos/interval)*interval;		        
+		            minpos = 0; //Math.floor(minpos/interval)*interval;
 		            interval = Math.ceil(maxpos / 10);
-		            total = maxpos - minpos + interval;	
-		            h = Math.round(height/total); 
+		            total = maxpos - minpos + interval;
+		            h = Math.round(height/total);
 		            var start = 10;
 		            var radius = 2;
 		            if (maxquestions>1)
 		                w = Math.round((width-start-radius)/(maxquestions-1));
 		            else
-		                w =  width/2;   
-		            	 
+		                w =  width/2;
+
 		            if(ctx)
 		            {
 		                for (i=0;i<total/interval;i++)
 		                {
-		                    if ((maxpos-i*interval) >= 0) canvasContainer.append('<div class="legend" style="top:'+(parseInt((i*interval+interval/2)*h-5))+'px">'+(maxpos-i*interval)+'</div>');
+		                    if ((maxpos-i*interval) >= 0) canvasContainer.append('<div class="legend" style="position:absolute;left:-10px;top:'+(parseInt((i*interval+interval/2)*h-5))+'px">'+(maxpos-i*interval)+'</div>');
 		                    ctx.beginPath();
                             ctx.moveTo(start,Math.round((i*interval+interval/2)*h) );
-                            ctx.lineTo(width,Math.round((i*interval+interval/2)*h) ); 
+                            ctx.lineTo(width,Math.round((i*interval+interval/2)*h) );
+							ctx.lineWidth=1;
+                            ctx.strokeStyle='#d0d0d0';
                             ctx.stroke();
 		                }
 		                jQuery.each(data,function(index,v){
 		                    ctx.beginPath();
 		                    ctx.strokeStyle = v.color;
 		                    ctx.fillStyle = v.color;
-		                     
+
 		                    //ctx.moveTo(start,Math.round((maxpos+interval/2)*h) );
 		                    var i = 0,j = 0;
 		                    jQuery.each(v.values,function(index1,v1){
-		                        j=-v1;   		 
-		                        if (i!=0)                   
-		                            ctx.lineTo(i*w+start,Math.round((maxpos+interval/2)*h+j*h));        
+		                        j=-v1;
+		                        if (i!=0)
+		                            ctx.lineTo(i*w+start,Math.round((maxpos+interval/2)*h+j*h));
 		                        else
-		                            ctx.moveTo(i*w+start,Math.round((maxpos+interval/2)*h+j*h));    
-		                        i++;	                
+		                            ctx.moveTo(i*w+start,Math.round((maxpos+interval/2)*h+j*h));
+		                        i++;
 		                     });
-		                
+
 		                     ctx.stroke();
 		                     var i = 0,j = 0;
 		                     jQuery.each(v.values,function(index1,v1){
-		                         j=-v1;   		                       	                    
+		                         j=-v1;
 		                         ctx.beginPath();
-		                         ctx.arc(i*w+start,Math.round((maxpos+interval/2)*h+j*h), radius, 0, 2 * Math.PI, true); 
-		                         ctx.fill();        
-		                         i++;	                
+		                         ctx.arc(i*w+start,Math.round((maxpos+interval/2)*h+j*h), radius, 0, 2 * Math.PI, true);
+		                         ctx.fill();
+		                         i++;
 		                     });
 		                });
 		            }
 		        }
             });
-		  
-		    ////////////////////////end canvas///////////////////////    
-});
-</script>			
+
+		    ////////////////////////end canvas///////////////////////
+
+</script>
 
 
 

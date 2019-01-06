@@ -1,14 +1,14 @@
-=== Contact Form to Email ===
+=== Contact Form Email ===
 Contributors: codepeople
-Donate link: http://form2email.dwbooster.com/download
-Tags: contact form,contact,email,contact form database,form,contact form excel,feedback,captcha,contact form plugin,form to email,form to database,contact form builder,form to csv,wordpress contact form,csv,contact form reports,form to excel,contact form csv,drag and drop contact form,excel
+Donate link: https://form2email.dwbooster.com/download
+Tags: contact form,contact,email,contact form database,form,contact form excel,form to email,form to database,contact form builder,form to csv,form to excel,contact form csv
 Requires at least: 3.0.5
-Tested up to: 4.5
+Tested up to: 5.0
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Contact form that sends the data to email and also to a database list and CSV file.
+Contact form with visual form builder. Contact form that sends the data to email, to a database list and to CSV / Excel files. 
 
 == Description ==
 
@@ -23,14 +23,16 @@ Contact Form to Email features:
 	► Field validation
 	► Printable reports
 	► One-click contact form
+    ► Classic and ajax submission available
 	► Automatic email reports
+    ► Supports GDPR compliant forms
 	► ... and more features (see below)
 
-The main purpose of the **Contact Form to Email** is, as the name indicates, to **create contact forms** and **send their data email addresses**.
+The **Contact Form to Email** is a powerful and easy WordPress plugin to create **contact forms** and **send their data email addresses**.
 
-In addition to that basic feature it also **saves the contact form data into a database**, provides **printable reports** and the option to **export selected data to CSV/Excel** files.
+**Contact Form to Email** also **saves the contact form data into a database**, provides **printable reports** and the option to **export selected data to CSV/Excel** files.
 
-= More about the Main Features: =
+= Contact Form to Email Main Features: =
 
 * **Email delivery / notifications:** The contact form data is sent by email to one or more email addresses. It also supports the configuration of auto-replies to the user who filled the contact form.
 * **Form data saved into the database:** Avoid losing submissions and keep a record of the received contact form messages.
@@ -43,12 +45,19 @@ In addition to that basic feature it also **saves the contact form data into a d
 * **Drag and drop contact form builder:** A basic and easy to use contact form builder for customizing the form fields and form validation.
 * **Customizable email messages:** Specify the text of the contact form email notifications. Supports both plain text emails and HTML formatted emails.
 * **Multi language support:** The contact form builder allows to enter the field labels and validations in any language. It supports special characters.
+* **Classic and Ajax submission:** After clicking the submit button the user can be redirected to a "thank you" page or a "thank you" message can be displayed in the same form page without having to refresh it. This can be configured in the settings.
+* **Enable/Disable notifications:** Both email notifications to administrators and email confirmation to users can be optionally enabled or disabled form the settings area.
 
- = More features = 
+
+= Contact Form to Email - More features = 
  
- There are also commercial versions of the Contact Form to Email with other features not listed here that can be get at http://form2email.dwbooster.com/download
+There are also commercial versions of the Contact Form to Email with other features not listed here that can be get at https://form2email.dwbooster.com/download
+ 
+Commercial version can be converted in a payment form / booking form with integration with mulitple payment gateways: PayPal Standard, PayPal Pro, Stripe, Authorize.net, Skrill, Mollie / iDeal, TargetPay / iDeal, SagePay, RedSys TPV and Sage Payments.
+ 
+Commercial version also features a ultra-powerful visual form builder, file upload fields, conditional logic, multi-page forms, WooCommerce integration, Mailchimp integration, Clickatell and Twilio SMS integration, iCal attachments, signature fields to sign with the mouse or directly in the touchscreens, etc...
 
-= Messages List =
+= Contact Form to Email Messages List =
 
 The messages list helps to check the past contact form submissions and print or export them. Includes a search/filter form with the following options:
 
@@ -152,9 +161,9 @@ The following translations are already included in the plugin:
 * Thai (th)
 * Ukrainian (uk)
 
-= Updates =
+= Contact Form to Email Updates =
 
-New features has been published in the current Contact Form to Email version 1.2.7 based on the feedback received and we would like to thank you all the people that have supported the development, provided feedback and feature requests. The plugin is currently over the 180,000 downloads/installations and a new set of updates is already being prepared, any feature requests will be welcome. Thank you!
+New features has been published in the current Contact Form to Email version 1.2.7 based on the feedback received and we would like to thank you all the people that have supported the development, provided feedback and feature requests. The plugin is currently over the 630,000 downloads/installations and a new set of updates is already being prepared, any feature requests will be welcome. Thank you!
 
 = New: Form Builder =
 
@@ -180,6 +189,8 @@ A: There is a tag named &lt;%INFO%&gt; that is replaced with all the information
 For doing that, click the desired field into the form builder and in the settings box for that field there is a read-only setting named "Field tag for the message (optional):". Copy & paste that tag into the contact form message text and after the form submission that tag will be replaced with the text entered in the form field.
 
 The tags have this structure (example): &lt;%fieldname1%&gt;, &lt;%fieldname2%&gt;, &lt;%fieldname3%&gt;, ...
+
+More info and supported tags at https://form2email.dwbooster.com/faq#q81
 
 = Q: Can I add a reference to the item number (submission number) into the email? =
 
@@ -271,9 +282,13 @@ A: For each contact form you will be able to edit the following settings:
 
 **Automatic Reports. Send submissions in CSV format via email:** This area contains many settings to automatically send reports every the specified period of time containing the data of all the contact forms submitted during that period of time. The report settings are explained more in detail in the tab "Other Notes" (see "Customizing the automatic email reports"). Note: All the submissions are stored into the contact form database, so can be easily recovered when needed.
 
+= Q: Can I get the URL of the page where the form was displayed before submission? =
+
+A: Yes, you can add the tag <%referrer%> to the email content and that tag will be replaced with the address of the page where the form was displayed and submitted.
+
 = Q: How can I apply CSS styles to the contact form fields? =
 
-A: To modify the **whole styles of the contact form fields and labels**, edit the styles file "wp-content/plugins/contact-form-to-email/css/stylepublic.css" and add these rules at the end of that file:
+A: To modify the **whole styles of the contact form fields and labels**, add the needed styles into the "Customization area >> Add Custom Styles" (at the bottom of the page that contains the list of forms)
 
 * **Change the styles of all the field labels:**
 
@@ -325,6 +340,13 @@ A: To modify the **whole styles of the contact form fields and labels**, edit th
 
 To get the modifications shown into the public contact form you may have to refresh the page twice or clear the browser cache to be sure that the old CSS styles aren't still being shown from the cache.
 
+More info at add the needed styles into the "Customization area >> Add Custom Styles" (at the bottom of the page that contains the list of calendars)
+
+= Q: Are the forms GDPR compliant? =
+
+A: In all plugin versions you can turn off IP tracking to avoid saving that user info and an "accept terms" / "accept GDPR" field is available.
+
+
 == Other Notes ==
 
 **Opening the contact form messages in Excel:** Go either to the "Reports" or "Messages" section. There is a button labeled "Export to CSV". CSV files can be opened in Excel, just double-click the downloaded CSV file, it will contain the selected contact form submissions, one per line.
@@ -345,11 +367,11 @@ There is a settings section info each form that allows to specify the label of t
 
 The class="pbSubmit" can be used to modify the button styles. 
 
-The styles can be applied into any of the CSS files of your theme or into the CSS file "contact-form-to-email\css\stylepublic.css". 
+The styles can be applied into any of the CSS files of your theme or add the needed styles into the "Contact Form to Email plugin >> Customization area >> Add Custom Styles" (at the bottom of the page that contains the list of forms) 
 
 For further modifications the submit button is located at the end of the file "cp-public-int.inc.php".
 
-For general CSS styles modifications to the form and samples check this FAQ entry: http://form2email.dwbooster.com/faq#q82
+For general CSS styles modifications to the form and samples check this FAQ entry: https://form2email.dwbooster.com/faq#q82
 
 
 = Customizing the automatic email reports =  
@@ -429,8 +451,529 @@ When you click a field already added into the contact form builder area, you can
 4. contact form validation settings
 5. Inserting a contact form into a page
 6. Built-in captcha image anti-spam protection
+7. New Wordpress Editor (Gutemberg) integration
+8. Elementor integration
 
 == Changelog ==
+
+= 1.2.75 =
+* Added Elementor integration
+
+= 1.2.74 =
+* Fixed bug in form edition
+
+= 1.2.73 =
+* Removed empty spaces/line breaks causing script conflicts 
+
+= 1.2.72 =
+* New Gutemberg Block
+
+= 1.2.71 =
+* Fixes to form builder area
+
+= 1.2.70 =
+* Improved error detection
+
+= 1.2.69 =
+* Form builder corrections
+
+= 1.2.68 =
+* Fixed conflict with loading page plugins
+
+= 1.2.67 =
+* Gutenberg compatibility updates
+
+= 1.2.66 =
+* Improved security in custom edition area (XSS and CSRF)
+
+= 1.2.65 =
+* Fixed conflict with third party plugins
+
+= 1.2.64 =
+* Added publishing wizard
+
+= 1.2.63 =
+* Improved messages list
+
+= 1.2.62 =
+* Improved CSS edition area
+
+= 1.2.61 =
+* Interface and stats section improvements
+
+= 1.2.60 =
+* Gutemberg integration update
+
+= 1.2.59 =
+* Fixed magic quotes issue
+
+= 1.2.58 =
+* Fixed conflict with Gutenberg editor
+
+= 1.2.57 =
+* Fix to Gutenberg integration
+
+= 1.2.56 =
+* New support option
+
+= 1.2.55 =
+* Compatible with Gutenberg
+
+= 1.2.54 =
+* Interface improvements
+
+= 1.2.53 =
+* New activation issue fixed
+
+= 1.2.52 =
+* Improved errors detection
+
+= 1.2.51 =
+* Fixed bug in multisite installations 
+
+= 1.2.50 =
+* Database creating encoding fix 
+
+= 1.2.49 =
+* Email reply-to header fix
+
+= 1.2.48 =
+* SMTP compatibility issue
+
+= 1.2.47 =
+* GDPR updates and small bug fixes
+
+= 1.2.46 =
+* Better activation and deactivation process
+
+= 1.2.45 =
+* Removed unneeded code blocks
+
+= 1.2.44 =
+* Typo/language fixes
+
+= 1.2.43 =
+* New admin notices
+
+= 1.2.42 =
+* Update to avoid issues with ASP extensions
+
+= 1.2.41 =
+* New features for deleting messages (GDPR-related improvements)
+
+= 1.2.40 =
+* Fixed captcha reloading issue
+
+= 1.2.39 =
+* Fixed form builder issue
+
+= 1.2.38 =
+* Fixed conflict with autoptimize plugin
+
+= 1.2.37 =
+* Added field for Accept terms / GDPR compliant feature
+
+= 1.2.36 =
+* Added indicator of form being edited
+
+= 1.2.34 =
+* Removed use of external Google CDN styles
+
+= 1.2.33 =
+* Adjustments to make the form GDPR compliant
+
+= 1.2.32 =
+* Renamed plugin references to avoid conflicts
+
+= 1.2.31 =
+* Admin interface improvements
+
+= 1.2.30 =
+* Fixed bug in graphic report
+
+= 1.2.29 =
+* Modification to blink option
+
+= 1.2.28 =
+* New feature to report the page where the form was submitted
+
+= 1.2.27 =
+* Improvements to the submission process to avoid duplicated submissions
+
+= 1.2.26 =
+* Feature for disabling email notifications when needed
+
+= 1.2.25 =
+* Added CSS and JavaScript customization panel
+
+= 1.2.24 =
+* Fixed bug in review panel
+
+= 1.2.23 =
+* Admin intf modifications
+
+= 1.2.22 =
+* Fixed conflict with 3rd party plugin
+
+= 1.2.21 =
+* Fixed layout of graphics in report page
+
+= 1.2.20 =
+* Fixed bug in ajax submission process
+
+= 1.2.19 =
+* Compatible with WordPress 4.9
+
+= 1.2.18 =
+* Filename sanitization improvements
+
+= 1.2.17 =
+* Ajax submission features
+
+= 1.2.16 =
+* German translation correction
+
+= 1.2.15 =
+* Database upgrade code updated
+
+= 1.2.14 =
+* Added default value for options
+
+= 1.2.12 =
+* Simpler filename sanitization
+
+= 1.2.11 =
+* Fixed initialization bug
+
+= 1.2.10 =
+* Improved messages list and print option
+
+= 1.2.09 =
+* Filename sanitization
+
+= 1.2.08 =
+* Validation updates
+
+= 1.2.07 =
+* Sanitization of "from" email address
+
+= 1.2.06 =
+* Moved plugin website and links to SSL
+
+= 1.2.05 =
+* Fixed bug on color selectors for captcha images
+
+= 1.1.99 =
+* Accessibility updates
+
+= 1.1.98 =
+* Fixed bugs to report graphics
+* Improvements to scripts loading
+
+= 1.1.97 =
+* Removed used of deprecated mysql_ functions
+
+= 1.1.96 =
+* Tested and compatible with WordPress 4.8
+
+= 1.1.95 =
+* Fixed bug that caused error while reusing resources
+
+= 1.1.94 =
+* Fixes script issue in previous update
+
+= 1.1.93 =
+* Added new settings and translation fields
+
+= 1.1.92 =                                                 
+* Improved IP address detection to get real user IP address
+
+= 1.1.91 =
+* Fixed bug in review box
+
+= 1.1.90 =
+* Major code update, multiple code optimization and security improvements
+
+= 1.1.89 =
+* Better query sanitization
+* Optional feedback option added
+
+= 1.1.88 =
+* Fixed XSS vulneravility
+
+= 1.1.87 =
+* Fix to the captcha align in the form builder
+
+= 1.1.86 =
+* Form builder update to support email type for mobile devices
+
+= 1.1.85 =
+* Field validations in dashboard to prevent common email config issues
+
+= 1.1.84 =
+* Minified script to improve form speed
+
+= 1.1.83 =
+* Included submission ID in CSV file
+
+= 1.1.82 =
+* Compatible with WP 4.7.3
+
+= 1.1.81 =
+* Help address update
+
+= 1.1.80 =
+* Security improvement
+
+= 1.1.79 =
+* Visualization update
+
+= 1.1.78 =
+* Documentation updates
+
+= 1.1.77 =
+* Bug fixed in add contact form feature
+
+= 1.1.76 =
+* Validation updates
+
+= 1.1.75 =
+* Fixed broken admin button
+
+= 1.1.74 =
+* Admin intf update
+
+= 1.1.73 =
+* Security improvement
+
+= 1.1.72 =
+* DB improvements
+
+= 1.1.71 =
+* Fixed typo
+
+= 1.1.70 =
+* Fixed intf. bug
+
+= 1.1.69 =
+* DB update
+
+= 1.1.68 =
+* Instructions update
+
+= 1.1.67 =
+* Fixes to filename generation
+
+= 1.1.66 =
+* Compatible with WP 4.7
+
+= 1.1.65 =
+* Database fix
+
+= 1.1.64 =
+* Doc link updated
+
+= 1.1.63 =
+* Database improvements
+
+= 1.1.62 =
+* Fixed database error on IP v6 networks
+
+= 1.1.61 =
+* Improved support tracking
+
+= 1.1.60 =
+* Code optimizations
+
+= 1.1.59 =
+* French language corrections
+
+= 1.1.58 =
+* Fix to visualization bug in Firefox
+
+= 1.1.57 =
+* Interface update
+
+= 1.1.56 =
+* Roll back to incorrect update
+
+= 1.1.55 =
+* More fixes for magic quotes issue
+
+= 1.1.54 =
+* Fixed magic quotes issue
+
+= 1.1.53 =
+* IP addr database update
+
+= 1.1.52 =
+* Modified processing of posted data
+
+= 1.1.51 =
+* New customization form
+
+= 1.1.50 =
+* Fixed XSS issue. Thank you to Netsparker Ltd (netsparker.com) for the notification.
+
+= 1.1.49 =
+* Compatible with WP 4.6
+
+= 1.1.48 =
+*  Fixed XSS issue (Thank you to Burak Kelebek for the report)
+
+= 1.1.47 =
+*  Modified admin addr
+
+= 1.1.46 =         
+* Fix on email tags
+
+= 1.1.45 =
+* Auto-formatting for from email
+
+= 1.1.44 =
+* Captcha params update
+
+= 1.1.43 =
+* Mail notice removed
+
+= 1.1.42 =
+* IP address not included as default to avoid anti-spam issues
+
+= 1.1.41 =
+* "From" email address corrected
+
+= 1.1.40 =
+* New documentation
+
+= 1.1.39 =
+* Removed old versions of Contact Form to Email
+
+= 1.1.38 =
+* Removed unneeded tag from public from
+
+= 1.1.37 =
+* Using plugins_loaded instead init
+
+= 1.1.35 =
+* Fixed bug in throubleshoot area
+
+= 1.1.34 =
+* jQuery deprecated functions replaced
+
+= 1.1.33 =
+* Slashes escape fix
+
+= 1.1.32 =
+* Compatible with WP 4.5
+
+= 1.1.31 =
+* New filter for file uploads
+
+= 1.1.30 =
+* Correction to support address
+
+= 1.1.29 =
+* Added nonces and security improvements
+
+= 1.1.28 =
+* Added demo pages
+
+= 1.1.27 =
+* New website & documentation links
+
+= 1.1.26 =
+* Updated API URLs
+
+= 1.1.25 =
+* Shortcode paramters sanitization
+
+= 1.1.24 =
+* Fixed PHP session issues
+
+= 1.1.23 =
+* Fixed typos in French translations
+
+= 1.1.22 =
+* Message list updates
+
+= 1.1.21 =
+* Improved captcha security
+
+= 1.1.20 =
+* Fixed CSS errors and the submit button style in the new WP themes
+
+= 1.1.19 =
+* Fixed validation tags
+
+= 1.1.18 =
+* Removed old styles
+
+= 1.1.17 =
+* Optimization. Removed code from old/unused behaviors
+
+= 1.1.16 =
+* Fixed captcha issues
+
+= 1.1.15 =
+* Fixed insert query
+
+= 1.1.14 =
+* Tested and compatible with WordPress 4.4
+
+= 1.1.13 =
+* Form validation is now activated from the form builder
+
+= 1.1.12 =
+* Updates to admin interface
+
+= 1.1.11 =
+* Interface modifications
+
+= 1.1.10 =
+* Support new charsets
+
+= 1.1.9 =
+* Default settings updated
+
+= 1.1.8 =
+* Fixed CSV sample format
+* Updated support links
+
+= 1.1.7 =
+* Update to the h2-h1 tags in the admin interface
+* Fixed bug with the tabs
+* Fixed initialization bug in reports
+* Fixed typo in dutch language
+* Removed unneeded data from the post process
+
+= 1.1.6 =
+* Compatible with the latest WordPress 4.2.3
+* Update to messages list.
+* Better code for captcha image generation.
+* Fixed conflict with zLib library
+* Update to the captcha generation to add content-length header
+
+= 1.1.5 =
+* Removed use of esc_sql for numeric values
+* Fixed XSS vulnerability
+* Fixed bug in translation functions.
+
+= 1.1.4 =
+* Compatible with the WordPress 4.2.2 version
+
+= 1.1.3 =
+* Sanitized parameters used in SQL queries.
+* Support for large forms.
+* Improved translations.
+* Compatible with the latest WordPress 4.2.x version
+
+= 1.1.2 =
+* Compatible with the latest WP versions
+* Improved translation code, compatible with the latest WP versions
+* New translations
+* Auto-detection and auto-solution for captcha image issues in servers with problem with the PHP sessions configuration
+* Fixed warning that appeared with PHP safe mode restrictions 
+* Sanitized GET parameters used in queries
 
 = 1.01 =
 * Compatible with the latest WP versions
@@ -443,146 +986,7 @@ When you click a field already added into the contact form builder area, you can
 * Fixed bug with back slashes on submissions
 
 
-= 1.1.2 =
-* Compatible with the latest WP versions
-* Improved translation code, compatible with the latest WP versions
-* New translations
-* Auto-detection and auto-solution for captcha image issues in servers with problem with the PHP sessions configuration
-* Fixed warning that appeared with PHP safe mode restrictions 
-* Sanitized GET parameters used in queries
-
-
-= 1.1.3 =
-* Sanitized parameters used in SQL queries.
-* Support for large forms.
-* Improved translations.
-* Compatible with the latest WordPress 4.2.x version
-
-= 1.1.4 =
-* Compatible with the WordPress 4.2.2 version
-
-= 1.1.5 =
-* Removed use of esc_sql for numeric values
-* Fixed XSS vulnerability
-* Fixed bug in translation functions.
-
-= 1.1.6 =
-* Compatible with the latest WordPress 4.2.3
-* Update to messages list.
-* Better code for captcha image generation.
-* Fixed conflict with zLib library
-* Update to the captcha generation to add content-length header
-
-= 1.1.7 =
-* Update to the h2-h1 tags in the admin interface
-* Fixed bug with the tabs
-* Fixed initialization bug in reports
-* Fixed typo in dutch language
-* Removed unneeded data from the post process
-
-= 1.1.8 =
-* Fixed CSV sample format
-* Updated support links
-
-= 1.1.9 =
-* Default settings updated
-
-= 1.1.10 =
-* Support new charsets
-
-= 1.1.11 =
-* Interface modifications
-
-= 1.1.12 =
-* Updates to admin interface
-
-= 1.1.13 =
-* Form validation is now activated from the form builder
-
-= 1.1.14 =
-* Tested and compatible with WordPress 4.4
-
-= 1.1.15 =
-* Fixed insert query
-
-= 1.1.16 =
-* Fixed captcha issues
-
-= 1.1.17 =
-* Optimization. Removed code from old/unused behaviors
-
-= 1.1.18 =
-* Removed old styles
-
-= 1.1.19 =
-* Fixed validation tags
-
-= 1.1.20 =
-* Fixed CSS errors and the submit button style in the new WP themes
-
-= 1.1.21 =
-* Improved captcha security
-
-= 1.1.22 =
-* Message list updates
-
-= 1.1.23 =
-* Fixed typos in French translations
-
-= 1.1.24 =
-* Fixed PHP session issues
-
-= 1.1.25 =
-* Shortcode paramters sanitization
-
-= 1.1.26 =
-* Updated API URLs
-
-= 1.1.27 =
-* New website & documentation links
-
-= 1.1.28 =
-* Added demo pages
-
-= 1.1.29 =
-* Added nonces and security improvements
-
-= 1.1.30 =
-* Correction to support address
-
-= 1.1.31 =
-* New filter for file uploads
-
-= 1.1.32 =
-* Compatible with WP 4.5
-
-= 1.1.33 =
-* Slashes escape fix
-
-= 1.1.34 =
-* jQuery deprecated functions replaced
-
-= 1.1.35 =
-* Fixed bug in throubleshoot area
-
-= 1.1.37 =
-* Using plugins_loaded instead init
-
-= 1.1.38 =
-* Removed unneeded tag from public from
-
-= 1.1.39 =
-* Removed old versions of Contact Form to Email
-
-= 1.1.40 =
-* New documentation
-
-= 1.1.41 =
-* "From" email address corrected
-
 == Upgrade Notice ==
 
-= 1.1.41 =
-* "From" email address corrected
-
-Important note: If you are using the Professional version don't update via the WP dashboard but using your personal update link. Contact us if you need further information: http://form2email.dwbooster.com/contact-us
+= 1.2.75 =
+* Added Elementor integration

@@ -1,6 +1,6 @@
 .fm-admin-notice {
     background: #fff;
-    border-top: 4px;
+    border: 4px;
     display: block;
     min-height: 68px;
     padding: 10px 40px 10px 125px;
@@ -10,15 +10,15 @@
     color: #10738B;
 }
 .fm-notice-logo {
-    clear: both;
-    content: "";
-    display: block;
-    background: url("../images/buttons.png") no-repeat 50% 112%;
-    width: 125px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 5px;
+  clear: both;
+  content: "";
+  display: block;
+  background: url("../images/form-maker-logo.png") no-repeat center;
+  width: 125px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
 }
 .fm-admin-notice > .dashicons {
     color: #424242;
@@ -48,4 +48,10 @@
 }
 .fm-blue {
     color: #10738B;
+}
+.fm-notice-old-form .fm-notice-logo{
+	background: url(../images/logowd.png) no-repeat 50% 20% !important;
+}
+.fm-notice-old-form .fm-notice-body{
+	padding-right: 15px !important;
 }

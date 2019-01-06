@@ -21,8 +21,13 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
 <div class="wrap">
 <h1><?php echo $this->plugin_name; ?></h1>
 
-<input type="button" name="backbtn" value="Back to items list..." onclick="document.location='options-general.php?page=<?php echo $this->menu_parameter; ?>';">
-<br /><br />
+<input type="button" name="backbtn" value="Back to items list..." onclick="document.location='admin.php?page=<?php echo $this->menu_parameter; ?>';">
+
+<div id="normal-sortables" class="meta-box-sortables">
+ <hr />
+ <h3>These settings are for: <?php echo strip_tags($this->get_option('form_name', "fixed")); ?></h3>
+</div>
+
 
 <form method="post" action="" name="cpformconf"> 
 <input name="<?php echo $this->prefix; ?>_post_options" type="hidden" value="1" />
@@ -55,17 +60,47 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
         </tr>       
         <tr valign="top">
         <th scope="row">"From" email (for fixed "from" addresses)</th>
-        <td><input type="text" name="fp_from_email" size="40" value="<?php echo esc_attr($this->get_option('fp_from_email', CP_CFEMAIL_DEFAULT_fp_from_email)); ?>" /></td>
+        <td><input required type="text" name="fp_from_email" size="40" value="<?php echo esc_attr($this->get_option('fp_from_email', CP_CFEMAIL_DEFAULT_fp_from_email)); ?>" /></td>
         </tr>             
         <tr valign="top">
         <th scope="row">Destination emails (comma separated)</th>
-        <td><input type="text" name="fp_destination_emails" size="40" value="<?php echo esc_attr($this->get_option('fp_destination_emails', CP_CFEMAIL_DEFAULT_fp_destination_emails)); ?>" /></td>
+        <td><input required type="text" name="fp_destination_emails" size="40" value="<?php echo esc_attr($this->get_option('fp_destination_emails', CP_CFEMAIL_DEFAULT_fp_destination_emails)); ?>" /></td>
         </tr>
         <tr valign="top">
+        <th scope="row">On submit action</th>
+        <td>
+           <?php $option = $this->get_option('onsubmitaction', '0'); ?>
+           <select name="onsubmitaction" onchange="javascript:fte_action_display();">
+             <option value="0"<?php if ($option == '0' || $option == '') echo ' selected'; ?>>Redirect to a "Thank you" page</option>
+             <option value="1"<?php if ($option == '1') echo ' selected'; ?>>Stay on the page, display a classic JavaScript alert box with a message</option>
+             <option value="2"<?php if ($option == '2') echo ' selected'; ?>>Stay on the page, display a jQuery dialog with a message</option>
+             <option value="3"<?php if ($option == '3') echo ' selected'; ?>>Replace form with a message</option>
+           </select>
+        </td>
+        </tr>    
+        <tr valign="top" id="opthank">
+        <th scope="row">Thank you page (after sending the message)</th>
+        <td><input type="text" name="fp_return_page" size="70" value="<?php echo esc_attr($this->get_option('fp_return_page', CP_CFEMAIL_DEFAULT_fp_return_page)); ?>" /></td>
+        </tr>  
+        <tr valign="top" id="opmsg">
+        <th scope="row">Message to display after submission</th>
+        <td><textarea name="fp_return_message" cols="80" rows="3"><?php echo esc_attr($this->get_option('fp_return_message', 'Thank you.')); ?></textarea></td>
+        </tr> 
+         <tr valign="top">
+        <th scope="row">Enable notification email?</th>
+        <td>
+          <?php $option = $this->get_option('fp_enableemail', 'true'); ?>
+          <select name="fp_enableemail"  onchange="javascript:fte_enable_display();">
+           <option value="true"<?php if ($option != 'false') echo ' selected'; ?>>Yes</option>
+           <option value="false"<?php if ($option == 'false') echo ' selected'; ?>>No</option>
+          </select>
+        </td>
+        </tr>        
+        <tr valign="top" id="fpemail1">
         <th scope="row">Email subject</th>
         <td><input type="text" name="fp_subject" size="70" value="<?php echo esc_attr($this->get_option('fp_subject', CP_CFEMAIL_DEFAULT_fp_subject)); ?>" /></td>
         </tr>
-        <tr valign="top">
+        <tr valign="top" id="fpemail2">
         <th scope="row">Include additional information?</th>
         <td>
           <?php $option = $this->get_option('fp_inc_additional_info', CP_CFEMAIL_DEFAULT_fp_inc_additional_info); ?>
@@ -74,12 +109,8 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
            <option value="false"<?php if ($option == 'false') echo ' selected'; ?>>No</option>
           </select>
         </td>
-        </tr>
-        <tr valign="top">
-        <th scope="row">Thank you page (after sending the message)</th>
-        <td><input type="text" name="fp_return_page" size="70" value="<?php echo esc_attr($this->get_option('fp_return_page', CP_CFEMAIL_DEFAULT_fp_return_page)); ?>" /></td>
-        </tr>          
-        <tr valign="top">
+        </tr>                           
+        <tr valign="top" id="fpemail3">
         <th scope="row">Email format?</th>
         <td>
           <?php $option = $this->get_option('fp_emailformat', CP_CFEMAIL_DEFAULT_email_format); ?>
@@ -89,7 +120,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
           </select>
         </td>
         </tr>        
-        <tr valign="top">
+        <tr valign="top" id="fpemail4">
         <th scope="row">Message</th>
         <td><textarea type="text" name="fp_message" rows="6" cols="80"><?php echo $this->get_option('fp_message', CP_CFEMAIL_DEFAULT_fp_message); ?></textarea></td>
         </tr>                                                               
@@ -110,14 +141,12 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
   <h3 class='hndle' style="padding:5px;"><span>Form Builder</span></h3>
   <div class="inside">   
 
-     <input type="hidden" name="form_structure" id="form_structure" size="180" value="<?php echo str_replace('"','&quot;',str_replace("\r","",str_replace("\n","",esc_attr($this->cleanJSON($this->get_option('form_structure', CP_CFEMAIL_DEFAULT_form_structure)))))); ?>" />
-     
-     <link href="<?php echo plugins_url('css/style.css', __FILE__); ?>" type="text/css" rel="stylesheet" />   
-     <link href="<?php echo plugins_url('css/cupertino/jquery-ui-1.8.20.custom.css', __FILE__); ?>" type="text/css" rel="stylesheet" />   
-        
+     <input type="hidden" name="form_structure" id="form_structure" size="180" value="<?php echo str_replace('"','&quot;',str_replace("\r","",str_replace("\n","",esc_attr($this->cleanJSON($this->get_option('form_structure', CP_CFEMAIL_DEFAULT_form_structure)))))); ?>" />             
         
      <script type="text/javascript">                 
        if (typeof jQuery === "undefined") {
+          // This code won't be used in most cases. This code is for preventing problems in wrong WP themes and conflicts with third party plugins.                  
+          // In some cases a third party plugin or WP theme affect the expected jQuery scripts, this code autodetect that and provide an alternative solution
           document.write ("<"+"script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></"+"script>");
           document.write ("<"+"script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.20/jquery-ui.min.js'></"+"script>");
        }
@@ -125,6 +154,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
        if (typeof $easyFormQuery == 'undefined')
        {
           // This code won't be used in most cases. This code is for preventing problems in wrong WP themes and conflicts with third party plugins.                  
+          // In some cases a third party plugin or WP theme affect the expected jQuery scripts, this code autodetect that and provide an alternative solution
           document.write ("<"+"script type='text/javascript' src='<?php echo plugins_url('js/jQuery.stringify.js', __FILE__); ?>'></"+"script>");
           document.write ("<"+"script type='text/javascript' src='<?php echo plugins_url('js/jquery.validate.js', __FILE__); ?>'></"+"script>");         
           document.write ("<"+"script type='text/javascript' src='<?php echo plugins_url('js/fbuilderf.jquery.js', __FILE__); ?>'></"+"script>");         
@@ -132,7 +162,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
      </script> 
              
      <script>
-         
+         jQuery(window).on('load', function(){
          $easyFormQuery(document).ready(function() {
             var f = $easyFormQuery("#fbuilder").fbuilder();
             f.fBuild.loadData("form_structure");
@@ -154,11 +184,18 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
      	   });
      		    
          }); 
+         
+        });
+        
         var randcaptcha = 1;
         function generateCaptcha()
         {            
            var d=new Date();
            var f = document.cpformconf;    
+		   var cv_background = f.cv_background.value;
+		   cv_background = cv_background.replace('#','');
+		   var cv_border = f.cv_border.value;
+		   cv_border = cv_border.replace('#','');
            var qs = "&width="+f.cv_width.value;
            qs += "&height="+f.cv_height.value;
            qs += "&letter_count="+f.cv_chars.value;
@@ -166,17 +203,56 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
            qs += "&max_size="+f.cv_max_font_size.value;
            qs += "&noise="+f.cv_noise.value;
            qs += "&noiselength="+f.cv_noise_length.value;
-           qs += "&bcolor="+f.cv_background.value;
-           qs += "&border="+f.cv_border.value;
+           qs += "&bcolor="+cv_background;
+           qs += "&border="+cv_border;
            qs += "&font="+f.cv_font.options[f.cv_font.selectedIndex].value;
            qs += "&r="+(randcaptcha++);
            
            document.getElementById("captchaimg").src= "<?php echo $this->get_site_url(true).'/?'.$this->prefix.'_captcha=captcha&inAdmin=1'; ?>"+qs;
         }
+        
+        function fte_action_display()
+        {
+           var f = document.cpformconf; 
+           var selection = f.onsubmitaction.options[f.onsubmitaction.selectedIndex].value;
+           if (selection == '0')
+           {
+               document.getElementById("opthank").style.display = '';
+               document.getElementById("opmsg").style.display = 'none';
+           }
+           else
+           {
+               document.getElementById("opthank").style.display = 'none';
+               document.getElementById("opmsg").style.display = '';
+           }    
+        }
+        fte_action_display();
+        
+        function fte_enable_display()
+        {
+           var f = document.cpformconf; 
+           var selection = f.fp_enableemail.options[f.fp_enableemail.selectedIndex].value;
+           if (selection != 'false')
+           {
+               document.getElementById("fpemail1").style.display = '';
+               document.getElementById("fpemail2").style.display = '';
+               document.getElementById("fpemail3").style.display = '';
+               document.getElementById("fpemail4").style.display = '';
+           }
+           else
+           {
+               document.getElementById("fpemail1").style.display = 'none';
+               document.getElementById("fpemail2").style.display = 'none';
+               document.getElementById("fpemail3").style.display = 'none';
+               document.getElementById("fpemail4").style.display = 'none';
+           }    
+        }
+        fte_enable_display();        
+        
 
      </script>
      
-     <div style="background:#fafafa;width:780px;" class="form-builder">
+     <div style="background:#fafafa;min-width:600px;" class="form-builder">
      
          <div class="column width50">
              <div id="tabs">
@@ -202,16 +278,18 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
      </div>        
    
   <div style="border:1px dotted black;background-color:#ffffaa;padding-left:15px;padding-right:15px;padding-top:5px;width:740px;font-size:12px;color:#000000;"> 
-   <p>The form builder supports 3 fields in this version: "Single Line Text", "Email" and "Text-area".</p>
-   <p>The full set of fields is available in the <a href="http://form2email.dwbooster.com/download">pro version</a>. The <a href="http://form2email.dwbooster.com/download">pro version</a> also supports:
+   <p>This version supports the most frequently used field types: "Single Line Text", "Email", "Text-area" and "Acceptance Checkbox".</p>
+   <p><button type="button" onclick="window.open('https://form2email.dwbooster.com/download?src=activatebtn');" style="cursor:pointer;height:35px;color:#20A020;font-weight:bold;">Activate the FULL form builder</button>
+   <p>The full set of fields also supports:
    <ul>
-    <li> - Dependand fields: Hide/show fields based in previous selections.</li>
+    <li> - Conditional Logic: Hide/show fields based in previous selections.</li>
     <li> - File uploads</li>
     <li> - Multi-page forms</li>
     <li> - Publish it as a widget in the sidebar</li>
+    <li> - Convert the form in a payment / booking form with integration with PayPal Standard, PayPal Pro, Stripe, Authorize.net, Skrill, Mollie / iDeal, TargetPay / iDeal, SagePay, RedSys TPV and Sage Payments.</li>
     <li> - ...and more fields and validations</li>
    </ul>
-   <p>There are also other plugins with similar features (not exactly the same features) but adding <a href="http://wordpress.org/extend/plugins/cp-contact-form-with-paypal/">the connection of the form to PayPal</a> or with <a href="http://wordpress.org/plugins/calculated-fields-form/">calculated fields</a>.</p>
+   <p>For an appointment booking option check the <a href="https://wordpress.org/plugins/appointment-hour-booking/">Appointment/Service Booking Calendar</a>.</p>
    </p>
    
   </div>
@@ -237,10 +315,17 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
         <td><input type="text" name="vs_text_nextbtn" size="40" value="<?php $label = esc_attr($this->get_option('vs_text_nextbtn', 'Next')); echo ($label==''?'Next':$label); ?>" /></td>
         </tr>  
         <tr valign="top">
+        <th scope="row">Page {0} of {0} (text):</th>
+        <td><input type="text" name="vs_text_page" size="6" value="<?php $label = esc_attr($this->get_option('vs_text_page', 'Page')); echo ($label==''?'Page':$label); ?>" />
+            X 
+            <input type="text" name="vs_text_of" size="3" value="<?php $label = esc_attr($this->get_option('vs_text_of', 'of')); echo ($label==''?'of':$label); ?>" />
+            Y</td>
+        </tr>         
+        <tr valign="top">
         <td colspan="2"> - The  <em>class="pbSubmit"</em> can be used to modify the button styles. <br />
-        - The styles can be applied into any of the CSS files of your theme or into the CSS file <em>"contact-form-to-email\css\stylepublic.css"</em>. <br />
+        - The styles can be applied into the <a href="?page=cp_contactformtoemail&edit=1&cal=<?php echo $this->item; ?>&item=css">CSS Customization Area</a>. <br />
         - For further modifications the submit button is located at the end of the file <em>"cp-public-int.inc.php"</em>.<br />
-        - For general CSS styles modifications to the form and samples <a href="http://form2email.dwbooster.com/faq#q82" target="_blank">check this FAQ</a>.
+        - For general CSS styles modifications to the form and samples <a href="https://form2email.dwbooster.com/faq#q82" target="_blank">check this FAQ</a>.
         </tr>
      </table>
   </div>    
@@ -257,46 +342,27 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
           <?php $option = $this->get_option('vs_use_validation', CP_CFEMAIL_DEFAULT_vs_use_validation); ?>
           <select name="vs_use_validation">
            <option value="true"<?php if ($option == 'true') echo ' selected'; ?>>Yes</option>
-           <!--<option value="false"<?php if ($option == 'false') echo ' selected'; ?>>No</option>-->
           </select>
         </td>
         </tr>
         <tr valign="top">
-        <th scope="row">"is required" text:</th>
-        <td><input type="text" name="vs_text_is_required" size="40" value="<?php echo esc_attr($this->get_option('vs_text_is_required', CP_CFEMAIL_DEFAULT_vs_text_is_required)); ?>" /></td>
+        <td scope="row">"is required" text:<br /><input type="text" required name="vs_text_is_required" size="40" value="<?php echo esc_attr($this->get_option('vs_text_is_required', CP_CFEMAIL_DEFAULT_vs_text_is_required)); ?>" /></td>
         </tr>             
          <tr valign="top">
-        <th scope="row">"is email" text:</th>
-        <td><input type="text" name="vs_text_is_email" size="70" value="<?php echo esc_attr($this->get_option('vs_text_is_email', CP_CFEMAIL_DEFAULT_vs_text_is_email)); ?>" /></td>
-        </tr>       
-        <tr valign="top">
-        <th scope="row">"is valid captcha" text:</th>
-        <td><input type="text" name="cv_text_enter_valid_captcha" size="70" value="<?php echo esc_attr($this->get_option('cv_text_enter_valid_captcha', CP_CFEMAIL_DEFAULT_cv_text_enter_valid_captcha)); ?>" /></td>
-        </tr>
-
-        <tr valign="top">
-        <th scope="row">"is valid date (mm/dd/yyyy)" text:</th>
-        <td><input type="text" name="vs_text_datemmddyyyy" size="70" value="<?php echo esc_attr($this->get_option('vs_text_datemmddyyyy', CP_CFEMAIL_DEFAULT_vs_text_datemmddyyyy)); ?>" /></td>
+        <td scope="row">"is email" text:<br /><input type="text" required name="vs_text_is_email" size="50" value="<?php echo esc_attr($this->get_option('vs_text_is_email', CP_CFEMAIL_DEFAULT_vs_text_is_email)); ?>" /></td>
+        <td scope="row">"is valid captcha" text:<br /><input type="text" name="cv_text_enter_valid_captcha" size="50" value="<?php echo esc_attr($this->get_option('cv_text_enter_valid_captcha', CP_CFEMAIL_DEFAULT_cv_text_enter_valid_captcha)); ?>" /></td>
         </tr>
         <tr valign="top">
-        <th scope="row">"is valid date (dd/mm/yyyy)" text:</th>
-        <td><input type="text" name="vs_text_dateddmmyyyy" size="70" value="<?php echo esc_attr($this->get_option('vs_text_dateddmmyyyy', CP_CFEMAIL_DEFAULT_vs_text_dateddmmyyyy)); ?>" /></td>
+        <td scope="row">"is valid date (mm/dd/yyyy)" text:<br /><input type="text" name="vs_text_datemmddyyyy" size="50" value="<?php echo esc_attr($this->get_option('vs_text_datemmddyyyy', CP_CFEMAIL_DEFAULT_vs_text_datemmddyyyy)); ?>" /></td>
+        <td scope="row">"is valid date (dd/mm/yyyy)" text:<br /><input type="text" name="vs_text_dateddmmyyyy" size="50" value="<?php echo esc_attr($this->get_option('vs_text_dateddmmyyyy', CP_CFEMAIL_DEFAULT_vs_text_dateddmmyyyy)); ?>" /></td>
         </tr>
         <tr valign="top">
-        <th scope="row">"is number" text:</th>
-        <td><input type="text" name="vs_text_number" size="70" value="<?php echo esc_attr($this->get_option('vs_text_number', CP_CFEMAIL_DEFAULT_vs_text_number)); ?>" /></td>
+        <td scope="row">"is number" text:<br /><input type="text" name="vs_text_number" size="50" value="<?php echo esc_attr($this->get_option('vs_text_number', CP_CFEMAIL_DEFAULT_vs_text_number)); ?>" /></td>
+        <td scope="row">"only digits" text:<br /><input type="text" name="vs_text_digits" size="50" value="<?php echo esc_attr($this->get_option('vs_text_digits', CP_CFEMAIL_DEFAULT_vs_text_digits)); ?>" /></td>
         </tr>
         <tr valign="top">
-        <th scope="row">"only digits" text:</th>
-        <td><input type="text" name="vs_text_digits" size="70" value="<?php echo esc_attr($this->get_option('vs_text_digits', CP_CFEMAIL_DEFAULT_vs_text_digits)); ?>" /></td>
-        </tr>
-        <tr valign="top">
-        <th scope="row">"under maximum" text:</th>
-        <td><input type="text" name="vs_text_max" size="70" value="<?php echo esc_attr($this->get_option('vs_text_max', CP_CFEMAIL_DEFAULT_vs_text_max)); ?>" /></td>
-        </tr>
-        <tr valign="top">
-        <th scope="row">"over minimum" text:</th>
-        <td><input type="text" name="vs_text_min" size="70" value="<?php echo esc_attr($this->get_option('vs_text_min', CP_CFEMAIL_DEFAULT_vs_text_min)); ?>" /></td>
+        <td scope="row">"under maximum" text:<br /><input type="text" name="vs_text_max" size="50" value="<?php echo esc_attr($this->get_option('vs_text_max', CP_CFEMAIL_DEFAULT_vs_text_max)); ?>" /></td>
+        <td scope="row">"over minimum" text:<br /><input type="text" name="vs_text_min" size="50" value="<?php echo esc_attr($this->get_option('vs_text_min', CP_CFEMAIL_DEFAULT_vs_text_min)); ?>" /></td>
         </tr>             
         
      </table>  
@@ -363,18 +429,18 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
         
         <tr valign="top">
          <th scope="row">Width:</th>
-         <td><input type="text" name="cv_width" size="10" value="<?php echo esc_attr($this->get_option('cv_width', CP_CFEMAIL_DEFAULT_cv_width)); ?>"  onblur="generateCaptcha();"  /></td>
+         <td><input type="number" name="cv_width" size="10" value="<?php echo esc_attr($this->get_option('cv_width', CP_CFEMAIL_DEFAULT_cv_width)); ?>"  onblur="generateCaptcha();"  /></td>
          <th scope="row">Height:</th>
-         <td><input type="text" name="cv_height" size="10" value="<?php echo esc_attr($this->get_option('cv_height', CP_CFEMAIL_DEFAULT_cv_height)); ?>" onblur="generateCaptcha();"  /></td>
+         <td><input type="number" name="cv_height" size="10" value="<?php echo esc_attr($this->get_option('cv_height', CP_CFEMAIL_DEFAULT_cv_height)); ?>" onblur="generateCaptcha();"  /></td>
          <th scope="row">Chars:</th>
-         <td><input type="text" name="cv_chars" size="10" value="<?php echo esc_attr($this->get_option('cv_chars', CP_CFEMAIL_DEFAULT_cv_chars)); ?>" onblur="generateCaptcha();"  /></td>
+         <td><input type="number" name="cv_chars" size="10" value="<?php echo esc_attr($this->get_option('cv_chars', CP_CFEMAIL_DEFAULT_cv_chars)); ?>" onblur="generateCaptcha();"  /></td>
         </tr>             
 
         <tr valign="top">
          <th scope="row">Min font size:</th>
-         <td><input type="text" name="cv_min_font_size" size="10" value="<?php echo esc_attr($this->get_option('cv_min_font_size', CP_CFEMAIL_DEFAULT_cv_min_font_size)); ?>" onblur="generateCaptcha();"  /></td>
+         <td><input type="number" name="cv_min_font_size" size="10" value="<?php echo esc_attr($this->get_option('cv_min_font_size', CP_CFEMAIL_DEFAULT_cv_min_font_size)); ?>" onblur="generateCaptcha();"  /></td>
          <th scope="row">Max font size:</th>
-         <td><input type="text" name="cv_max_font_size" size="10" value="<?php echo esc_attr($this->get_option('cv_max_font_size', CP_CFEMAIL_DEFAULT_cv_max_font_size)); ?>" onblur="generateCaptcha();"  /></td>        
+         <td><input type="number" name="cv_max_font_size" size="10" value="<?php echo esc_attr($this->get_option('cv_max_font_size', CP_CFEMAIL_DEFAULT_cv_max_font_size)); ?>" onblur="generateCaptcha();"  /></td>        
          <td colspan="2" rowspan="">
            Preview:<br />
              <br />
@@ -385,17 +451,17 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
 
         <tr valign="top">
          <th scope="row">Noise:</th>
-         <td><input type="text" name="cv_noise" size="10" value="<?php echo esc_attr($this->get_option('cv_noise', CP_CFEMAIL_DEFAULT_cv_noise)); ?>" onblur="generateCaptcha();" /></td>
+         <td><input type="number" name="cv_noise" size="10" value="<?php echo esc_attr($this->get_option('cv_noise', CP_CFEMAIL_DEFAULT_cv_noise)); ?>" onblur="generateCaptcha();" /></td>
          <th scope="row">Noise Length:</th>
-         <td><input type="text" name="cv_noise_length" size="10" value="<?php echo esc_attr($this->get_option('cv_noise_length', CP_CFEMAIL_DEFAULT_cv_noise_length)); ?>" onblur="generateCaptcha();" /></td>        
+         <td><input type="number" name="cv_noise_length" size="10" value="<?php echo esc_attr($this->get_option('cv_noise_length', CP_CFEMAIL_DEFAULT_cv_noise_length)); ?>" onblur="generateCaptcha();" /></td>        
         </tr>          
         
 
         <tr valign="top">
          <th scope="row">Background:</th>
-         <td><input type="text" name="cv_background" size="10" value="<?php echo esc_attr($this->get_option('cv_background', CP_CFEMAIL_DEFAULT_cv_background)); ?>" onblur="generateCaptcha();" /></td>
+         <td><input type="color" name="cv_background" size="10" value="#<?php echo esc_attr($this->get_option('cv_background', CP_CFEMAIL_DEFAULT_cv_background)); ?>" onchange="generateCaptcha();" /></td>
          <th scope="row">Border:</th>
-         <td><input type="text" name="cv_border" size="10" value="<?php echo esc_attr($this->get_option('cv_border', CP_CFEMAIL_DEFAULT_cv_border)); ?>" onblur="generateCaptcha();" /></td>        
+         <td><input type="color" name="cv_border" size="10" value="#<?php echo esc_attr($this->get_option('cv_border', CP_CFEMAIL_DEFAULT_cv_border)); ?>" onchange="generateCaptcha();" /></td>        
         </tr>    
         
         <tr valign="top">
@@ -431,7 +497,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
         </tr>
         <tr valign="top">
         <th scope="row">Send report every</th>
-        <td><input type="text" name="rep_days" size="4" value="<?php echo esc_attr($this->get_option('rep_days', '7')); ?>" /> days</td>
+        <td><input type="number" name="rep_days" size="4" value="<?php echo esc_attr($this->get_option('rep_days', '7')); ?>" /> days</td>
         </tr>        
         <tr valign="top">
         <th scope="row">Send report after this hour (server time)</th>
@@ -487,7 +553,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST[$this->prefix.'_post_
 <p class="submit"><input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes"  /></p>
 
 
-[<a href="http://form2email.dwbooster.com/contact-us?product=contact-form-to-email&version=1.1.5&ref=dashboard-settings" target="_blank">Request Custom Modifications</a>] | [<a href="<?php echo $this->plugin_URL; ?>" target="_blank">Help</a>]
+[<a href="https://wordpress.org/support/plugin/contact-form-to-email#new-post" target="_blank">Support</a>] | [<a href="<?php echo $this->plugin_URL; ?>" target="_blank">Help</a>]
 </form>
 </div>
 <script type="text/javascript">generateCaptcha();</script>

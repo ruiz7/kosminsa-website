@@ -26,7 +26,7 @@ define('DB_NAME', 'redy_wordpress');
 define('DB_USER', 'root');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'root');
+define('DB_PASSWORD', 'R00t13#');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');

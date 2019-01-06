@@ -1,7 +1,6 @@
 /*global $:false */
 
 jQuery(document).ready(function($){'use strict';
-
 	$('.nav.navbar-nav').onePageNav({
 		currentClass: 'active',
 	    changeHash: false,
@@ -28,4 +27,6 @@ jQuery(document).ready(function($){'use strict';
 	$(window).scroll(function() {
 		stickyNav();
 	});
+
 });
+
